@@ -9,7 +9,7 @@ const list = document.getElementById('todo-list')
 const itemCountSpan = document.getElementById('item-count')
 const uncheckedCountSpan = document.getElementById('unchecked-count')
 
-let todos = [{ id: 991, text: 'Завдання 1', check: true }];
+let todos = [];
 let id = todos.length;
 
 fillLocal();
