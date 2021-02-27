@@ -1,99 +1,50 @@
-const classNames = {
-    TODO_ITEM: 'todo-container',
-    TODO_CHECKBOX: 'todo-checkbox',
-    TODO_TEXT: 'todo-text',
-    TODO_DELETE: 'todo-delete',
-}
-
-const list = document.getElementById('todo-list')
-const itemCountSpan = document.getElementById('item-count')
-const uncheckedCountSpan = document.getElementById('unchecked-count')
-
-let todos = [];
-let id = todos.length;
-
-fillLocal();
-
-class Todo {
+const Todo = props => (
+    <li>
+       <input type="checkbox" checked={props.todo.check} onChange={props.onChange}/>
+        <button onClick={props.onDelete}>Delete</button>
+        <span>{props.todo.text}</span>
+    </li>
+)
+let id =0;
+class App extends React.Component {
     constructor() {
-        this.text = this.getText();
-        this.check = false;
-        this.id = id++;
+        super();
+        this.state = {
+            todos: [
+                { id: 999, text: 'task 1', check: true },
+                { id: 998, text: 'task 1', check: false }
+            ]
+        }
     }
-    getText() {
-        return prompt("Enter task to do:");
+    addTodo(){
+        const text = promt("add todo");
+        this.setState({todos: [...this.state.todos, {id: id++, text: text, check: false}]})
     }
-}
-//<li>
-//<input type="checkbox">
-//<button> delete </button>
-//<span> Text </span>
-//</li>
+    deleteTodo(id){
+        this.setState({
+            todos: this.state.todos.filter(todo => todo.id !==id)
+        })
+    }
+    changeTodo(id){
+        this.setState({todos: this.state.todos.map(todo => todo.id == id ? {...todo, check: !todo.check } : todo)})
+    }
 
-function newTodo() {
-    //get text
-    //create Todo()
-    const todo = new Todo();
-    todos.push(todo);
-    render();
-}
+    render() {
+        return (
+            <div>
 
-function render() {
-    list.innerHTML = '';
-    todos.map(renderTodo).forEach(todo => list.appendChild(todo));
-    //update counters
-    itemCountSpan.textContent = todos.length;
-    uncheckedCountSpan.textContent = todos.filter(todo => !todo.check).length;
-    saveLocal();
-}
-
-function deleteTodo(id) {
-    //find the right todo to delete
-    //delete
-    todos = todos.filter(todo => todo.id !== id);
-    render();
-}
-
-function renderTodo(todo) {
-    //create li
-    //create input checkbox
-    //create button
-    //create span
-    //console.log('todo', todo);
-    const li = document.createElement('li');
-    li.innerHTML = ` 
-    <input type="checkbox" onchange="changeTodo(${todo.id}) " ${todo.check ? "checked" : ""}>
-    <button class="deletebutton" onclick="deleteTodo(${todo.id})"> del</button>
-    <span class="todo-text">${todo.text} </span>
-    `;
-
-    return li;
-}
-
-function changeTodo(id) {
-    //variant 1  for (let i = 0; i < todos.length; i++) {
-    //     if (todos[i].id === id) {
-    //         todos[i].check = !todos[i].check;
-    //         break;
-    //     }
-    // }
-    // variant 2  todos = todos.map(todo => todo.id == id ? { id: todo.id, text: todo.text, check: !todo.check } : todo);
-    todos = todos.map(todo => todo.id == id ? {...todo, check: !todo.check } : todo);
-    // console.log("todos", todos);
-    uncheckedCountSpan.textContent = todos.filter(todo => !todo.check).length;
-    saveLocal();
-}
-
-function saveLocal() {
-    localStorage.clear();
-    localStorage.List = JSON.stringify(todos);
-    //Convert a JavaScript object into a string 
-}
-
-function fillLocal() {
-    if (localStorage.length > 0) {
-        todos = JSON.parse(localStorage.List);
-        //data becomes a JavaScript object
-        render();
+                <h2> My TODO App </h2>
+                <div> Todo count:{this.state.todos.length} </div>  
+                <div>Unchecked Todod count: {this.state.todos.filter(todo => !todo.check).length}</div>
+                <button onClick={()=> this.addTodo()}> Add todo </button>
+                <ul>
+                {this.state.todos.map(todo =><Todo 
+                    onDelete={()=>this.deleteTodo(todo.id) } 
+                    onChange={()=> this.changeTodo(todo.id)} 
+                    todo={todo}/>)}
+                </ul>
+            </div>
+        )
     }
 }
+ReactDOM.render(< App />, document.getElementById('root'));
